@@ -1,0 +1,34 @@
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{tikz}
+\usepackage{ifthen}
+\input{../CommandesPerso.tex}
+
+    \begin{document}
+      \begin{tikzpicture}
+      \usetikzlibrary{calc}
+      \usetikzlibrary{3d}
+
+      \def\scale{3}
+      \def\netx{0}
+      \def\nety{0}
+      \def\netz{0}
+
+      \def\coblue{blue!50!gray}
+      \def\coorange{orange!50!gray}
+      \def\cogreen{green!50!gray}
+      \def\copurple{purple!50!white}
+
+      \imagelayer{1.3*\scale}{0.05*\scale+\netx}{\nety}{\netz}{nobu_gray}{Image}{$32\times32\times1$}
+      \convlayer{1.1*\scale}{1.1*\scale}{0.1*\scale}{Conv1}{\coblue}{\netx+0.8*\scale}{\nety}{\netz}{{28}{28}{6}}
+      \convlayer{0.7*\scale}{0.7*\scale}{0.1*\scale}{Pool1}{\coorange}{\netx+1.5*\scale}{\nety}{\netz}{{14}{14}{6}}
+      \convlayer{0.7*\scale}{0.7*\scale}{0.4*\scale}{Conv2}{\coblue}{\netx+2.4*\scale}{\nety}{\netz}{{10}{10}{16}}
+      \convlayer{0.5*\scale}{0.5*\scale}{0.1*\scale}{Pool2}{\coorange}{\netx+3.3*\scale}{\nety}{\netz}{{5}{5}{16}}
+      \fclayer{\scale}{0.1*\scale}{FC1}{\copurple}{\netx+3.9*\scale}{\nety}{\netz}{120}
+      \fclayer{\scale}{0.1*\scale}{FC2}{\copurple}{\netx+4.3*\scale}{\nety}{\netz}{80}
+      \fclayer{0.8*\scale}{0.1*\scale}{FC3}{\copurple}{\netx+4.7*\scale}{\nety}{\netz}{10}
+      \node (out) at (\netx+5.8*\scale,\nety) {\Large ``Chat''};
+      \draw[->] (\netx+4.75*\scale,\nety) -- (out.west);
+
+      \end{tikzpicture}
+    \end{document}

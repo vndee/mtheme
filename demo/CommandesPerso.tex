@@ -1,0 +1,204 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%           Commandes perso            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Figures centrées, et en position 'here, top, bottom or page'
+\newenvironment{figureth}{%
+		\begin{figure}[htbp]
+			\centering
+	}{
+		\end{figure}
+		}
+
+
+%% Tableaux centrés, et en position 'here, top, bottom or page'
+\newenvironment{tableth}{%
+		\begin{table}[htbp]
+			\centering
+			%\rowcolors{1}{coleurtableau}{coleurtableau}
+	}{
+		\end{table}
+		}
+
+%% Sous-figures centrées, en position 'top'
+\newenvironment{subfigureth}[1]{%
+	\begin{subfigure}[t]{#1}
+	\centering
+}{
+	\end{subfigure}
+}
+
+\newcommand{\citationChap}[2]{%
+	\epigraph{\og \textit{#1} \fg{}}{#2}
+}
+
+%% On commence par une page impaire quand on change le style de numérotation de pages
+\let\oldpagenumbering\pagenumbering
+\renewcommand{\pagenumbering}[1]{%
+	\cleardoublepage
+	\oldpagenumbering{#1}
+}
+
+%% Légende du dataset ISPRS
+\newcommand\isprslegende{
+Légende\,: \textcolor{Black}{blanc}\,: routes, \textcolor{Blue}{bleu}\,: bâtiments, \textcolor{Cerulean}{cyan}\,: végétation basse, \textcolor{OliveGreen}{vert}\,: arbres, \textcolor{Dandelion}{jaune}\,: véhicules, \textcolor{BrickRed}{rouge}\,: autre.
+}
+
+%% Dessiner des réseaux de neurones avec Tikz
+\newcommand{\convlayer}[9]{%{h}{w}{d}{name}{color}{x}{y}{z}%{note w}{note h}{note d}
+   \def\h{#1}
+   \def\w{#2}
+   \def\d{#3}
+   \def\name{#4}
+   \ifthenelse {\equal{#5} {}} {\def\col{white}} {\def\col{#5}}
+   \def\x{#6}
+   \ifthenelse {\equal{#7} {}} {\def\y{0}} {\def\y{#7}}
+   \ifthenelse {\equal{#8} {}} {\def\z{0}} {\def\z{#8}}
+   % ne faites pas ça chez vous !
+   \ifthenelse {\equal{#9} {}} {\convlayercontinued{}{}{}} {\convlayercontinued#9}
+}
+
+\newcommand\convlayercontinued[3]{
+   \def\notew{#1}
+   \def\noteh{#2}
+   \def\noted{#3}
+   \coordinate (A) at (\x-\d/2,  \y-\h/2, \z-\w/2);
+   \coordinate (B) at (\x-\d/2,  \y-\h/2, \z+\w/2);
+   \coordinate (C) at (\x-\d/2,  \y+\h/2, \z+\w/2);
+   \coordinate (D) at (\x-\d/2,  \y+\h/2, \z-\w/2);
+   \coordinate (E) at (\x+\d/2,  \y-\h/2, \z-\w/2);
+   \coordinate (F) at (\x+\d/2,  \y-\h/2, \z+\w/2);
+   \coordinate (G) at (\x+\d/2,  \y+\h/2, \z+\w/2);
+   \coordinate (H) at (\x+\d/2,  \y+\h/2, \z-\w/2);
+
+    \draw [draw opacity=0.3, fill opacity=0.8, fill=\col!60!white] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw [draw opacity=0.3, fill opacity=0.8, fill=\col!60!white] (A) -- (B) -- (F) -- (E) -- cycle;
+    % Face haut
+    %\draw [left color=\col!60!white, right color=\col!80!white, shading=axis, shading angle=180] (C) -- (D)  -- (H) -- (G) -- cycle;
+    \draw [fill opacity=0.9, fill=\col!70!white] (C) -- node[rotate=45,above] {\small \name} (D) -- (H) -- (G) -- cycle;
+    %\draw [fill opacity=0.9, fill=\col!70!white] (C) -- (D) -- node[above] {\small \name} (H) -- (G) -- cycle;
+    % Face droite
+    \draw [fill opacity=0.9, fill=\col!60!white] (E) -- node[pos=0.75,rotate=45,below] {\scriptsize \notew} (F) -- (G) --  (H) -- cycle;
+    % Face avant
+    %\draw [shading=axis, left color=\col!60!white, right color=\col!40!white, shading angle=-45] (B) -- node[above,rotate=90] {\scriptsize \noteh} (C) -- (G) -- (F) -- node[below] {\scriptsize \noted}  cycle;
+    \draw [fill opacity=0.9, fill=\col!50!white] (B) -- node[above,rotate=90] {\scriptsize \noteh} (C) -- (G) -- (F) -- node[below] {\scriptsize \noted}  cycle;
+}
+
+\newcommand{\fclayer}[8]{%{h}{w}{name}{color}{x}{y}{z}
+   \def\h{#1}
+   \def\w{#2}
+   \def\name{#3}
+   \ifthenelse {\equal{#4} {}} {\def\col{white}} {\def\col{#4}}
+   \def\x{#5}
+   \def\y{#6}
+   \def\z{#7}
+   \def\note{#8}
+   \coordinate (A) at (\x-\w/2,  \y-\h/2, \z);
+   \coordinate (B) at (\x+\w/2,  \y-\h/2, \z);
+   \coordinate (C) at (\x+\w/2,  \y+\h/2, \z);
+   \coordinate (D) at (\x-\w/2,  \y+\h/2, \z);
+
+   \pgfmathparse{4*\w}\let\boxwidth\pgfmathresult
+    \draw [fill=\col] (A) -- node[below,text width=\boxwidth cm,align=center] {\scriptsize \note} (B) -- (C) -- (D) -- cycle;
+
+    \node (N) at ($(A)!0.5!(B)+(0,-1,0)$) {\name};
+}
+
+\newcommand{\alexnet}[4]{%{scale}{x}{y}{z}
+  \def\scale{#1}
+  \def\alexx{#2}
+  \def\alexy{#3}
+  \def\alexz{#4}
+
+
+  \def\coblue{blue!50!white}
+  \def\fcgrey{gray!50!white}
+
+  \convlayer{1.3*\scale}{1.3*\scale}{0.02*\scale}{Image}{\coblue}{\alexx}{\alexy}{\alexz}{{227}{227}{3}}
+  \convlayer{1.1*\scale}{1.1*\scale}{0.08*\scale}{Conv1}{\coblue}{\alexx+0.7*\scale}{\alexy}{\alexz}{{55}{55}{96}}
+  \convlayer{0.7*\scale}{0.7*\scale}{0.5*\scale}{Conv2}{\coblue}{\alexx+1.5*\scale}{\alexy}{\alexz}{{27}{27}{256}}
+  \convlayer{0.5*\scale}{0.5*\scale}{0.8*\scale}{Conv3}{\coblue}{\alexx+2.6*\scale}{\alexy}{\alexz}{{13}{13}{384}}
+  \convlayer{0.5*\scale}{0.5*\scale}{0.8*\scale}{Conv4}{\coblue}{\alexx+3.8*\scale}{\alexy}{\alexz}{{13}{13}{384}}
+  \convlayer{0.5*\scale}{0.5*\scale}{0.5*\scale}{Conv5}{\coblue}{\alexx+4.8*\scale}{\alexy}{\alexz}{{13}{13}{256}}
+  \fclayer{\scale}{0.1*\scale}{FC1}{\fcgrey}{\alexx+5.4*\scale}{\alexy}{\alexz}{4096}
+  \fclayer{\scale}{0.1*\scale}{FC2}{\fcgrey}{\alexx+5.7*\scale}{\alexy}{\alexz}{4096}
+  \fclayer{\scale}{0.1*\scale}{FC3}{\fcgrey}{\alexx+6.0*\scale}{\alexy}{\alexz}{1000}
+}
+
+\newcommand{\imagelayer}[7]{%{width}{x}{y}{z}{path}{text_up}{text_down}
+    \pgfmathparse{#1}\let\w\pgfmathresult
+    \begin{scope}[canvas is yz plane at x=#2]
+     \node[transform shape] (source) at (#3, #4) {\includegraphics[angle=-90,width=\w cm]{#5}};
+    \end{scope}
+     \node [transform shape, rotate=45, above] at (source.east) {#6};
+     \node [transform shape, rotate=45, below] at (source.west) {\scriptsize{#7}};
+}
+
+\def\fourier{\mathcal{F}}
+
+\newcommand{\lightspectrum}{%
+\pgfplotsset{
+    % this *defines* a custom colormap ...
+    colormap={slategraywhite}{color(0cm)=(red); color(1cm)=(red); color(2cm)=(red); color(3cm)=(red); color(4cm)=(orange); color(5cm)=(yellow); color(6cm)=(green); color(7cm)=(blue); color(8cm)=(blue); color(9cm)=(purple); color(10cm)=(purple); color(12cm)=(black)}
+}
+\node at (1.5, 2.7) {\small 1mm};
+\node at (4, 3) {Infrarouge};
+\node at (7.75, 2.7) {\small 800nm};
+\node at (9, 3) {Visible};
+\node at (10.5, 2.7) {\small 400nm};
+\node at (12, 3) {Ultraviolet};
+\node at (13.5, 2.7) {\small 10nm};
+\draw[->] (1, 2.5) -- (14, 2.5);
+\begin{axis}[hide axis,width=16cm,height=4cm,colormap name=slategraywhite]
+\addplot[domain=20:1000,samples=1500,ultra thick, point meta=x*x,mesh]{sin(x*x/80)};
+\end{axis}
+}
+
+% Union généralisée
+\newcommand{\wbigcup}{\mathop{\bigcup}\displaylimits}
+
+\newcommand{\res}[2]{%
+	\ifthenelse{\isempty{#2}}%
+	{\num{#1}}%
+	{\num{#1}{\footnotesize $\pm$ \num{#2}}}}
+\newcommand{\bres}[2]{%
+	\ifthenelse{\isempty{#2}}%
+	{\textbf{\num{#1}}}%
+	{\textbf{\num{#1}}{\footnotesize $\pm$ \num{#2}}}}
+\newcommand{\bbres}[2]{%
+	\ifthenelse{\isempty{#2}}%
+	{\textit{\num{#1}}}%
+	{\textit{\num{#1}}{\footnotesize $\pm$ \num{#2}}}}
+
+\newcommand{\drawkernel}[9]{
+\begin{tikzpicture}
+	\draw[step=1cm,gray!50!white,very thin] (0,0) grid (3,3);
+	\kernelnode{0.5}{0.5}{#1};
+	\kernelnode{0.5}{1.5}{#2};
+	\kernelnode{0.5}{2.5}{#3};
+	\kernelnode{1.5}{0.5}{#4};
+	\kernelnode{1.5}{1.5}{#5};
+	\kernelnode{1.5}{2.5}{#6};
+	\kernelnode{2.5}{0.5}{#7};
+	\kernelnode{2.5}{1.5}{#8};
+	\kernelnode{2.5}{2.5}{#9};
+\end{tikzpicture}
+}
+
+\newcommand{\kernelnode}[3]{%{x}{y}{value}
+	\ifthenelse{\equal{#3}{0}}{
+		\def\kcolor{gray}
+	}{
+		\def\kcolor{black}
+	}
+	\node[\kcolor] at (#1, #2) {#3};
+}
+
+\newcommand{\chapsummary}[1]{
+\section*{Résumé du chapitre :}
+\parbox{0.9\linewidth}{
+\setlength{\parindent}{4ex}
+#1}
+}
+
+\newcommand{\eqname}[1]{\tag*{\small (#1)}}
